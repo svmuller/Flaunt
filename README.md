@@ -2,6 +2,8 @@
 
 Reveals elements on load/scroll
 
+[Demo available here](https://svmuller.github.io/Flaunt/)
+
 ### Basic usage
 
 ```javascript
