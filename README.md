@@ -17,3 +17,4 @@ new Flaunt({
 ### Dependency
 
 The animations are powered by GSAP's Tweenlite
+

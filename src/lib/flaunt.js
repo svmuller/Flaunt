@@ -22,7 +22,7 @@ var qs = function (s) {
         },
         slide: {
             opacity: true,
-            xDistance: -32,
+            xDistance: 0,
             yDistance: 0
         }
     };
@@ -59,7 +59,6 @@ var qs = function (s) {
         const el = this.element;
         if (typeof (el) != 'undefined' && el != null) {
             const rect = el.getBoundingClientRect();
-            const _ = this;
 
             // Detect request animation frame
             var scroll = window.requestAnimationFrame ||
@@ -82,7 +81,6 @@ var qs = function (s) {
                 if (((window.pageYOffset || document.documentElement.scrollTop) - (document.documentElement.clientTop || 0)) + (window.innerHeight / 1.6) > Math.round(rect.top)) {
                     return _.unveil();
                 }
-
                 scroll(loop);
             }
 
@@ -150,8 +148,6 @@ var qs = function (s) {
             const yDistance = this.options.slide.yDistance;
             let opacityOptions = this.options.slide.opacity == true ? 0 : 1;
 
-            el.style.willChange = 'transform, opacity';
-
             TweenLite.to(el, 0, {
                 autoAlpha: opacityOptions,
                 x: xDistance,
@@ -170,10 +166,7 @@ var qs = function (s) {
                 ease: self.options.easing,
                 autoAlpha: 1,
                 x: 0,
-                y: 0,
-                onComplete: () => {
-                    el.style.willChange = 'auto';
-                }
+                y: 0
             });
         }
     }
