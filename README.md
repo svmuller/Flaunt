@@ -10,7 +10,15 @@ Reveals elements on load/scroll
 new Flaunt({
     el: '<your element>',
     onLoad: true,
-    effect: 'mask'
+    animation: {
+        mask: {},
+        translate: {
+            x: 32,
+        },
+        scale; {
+          y: 1.5
+        }
+    }
 });
 ```
 
@@ -20,4 +28,4 @@ The animations are powered by GSAP's Tweenlite
 
 ### Compatibility
 
-The masking effect is based on CSS clip-path. If not supported, like in IE, it will degrade to a simple slide-in/opacity animation
+WIP
