@@ -15,7 +15,7 @@ new Flaunt({
         translate: {
             x: 32,
         },
-        scale; {
+        scale: {
           y: 1.5
         }
     }
