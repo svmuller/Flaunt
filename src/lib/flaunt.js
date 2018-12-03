@@ -10,26 +10,31 @@ var qs = function (s) {
 
     const defaults = {
         el: '',
-        effect: '',
         duration: 1.2,
         delay: 0,
         onLoad: false,
         easing: 'easeInOutQuart',
         parentStart: true,
-        mask: {
-            yFactor: 0,
-            xFactor: 0,
-        },
-        slide: {
-            opacity: true,
-            xDistance: 0,
-            yDistance: 0
+        animation: {
+            mask: {
+                yOffset: 0,
+                xOffset: 0
+            },
+            translate: {
+                x: 0,
+                y: 0
+            },
+            scale: {
+                x: 0,
+                y: 0
+            },
+            opacity: 1
         }
     };
 
     window.Flaunt = function (options) {
         this.options = extend(defaults, options);
-        this.element = (typeof this.options.el === 'string') ? $(this.options.el) : this.options.el;
+        this.element = (typeof this.options.el === 'string') ? document.querySelector(this.options.el) : this.options.el;
         this.lastScrollY = 0;
         this.ticking = false;
         this.isClipPathSupported = areClipPathShapesSupported();
@@ -37,26 +42,27 @@ var qs = function (s) {
     };
 
     Flaunt.prototype.init = function () {
-        if (this.options.effect === 'mask') {
-            this.mask();
-        } else if (this.options.effect === 'slide') {
-            this.hide();
-        }
-        this.animate();
+        this.startState();
+        this.whenToAnimate();
     };
 
-    Flaunt.prototype.animate = function () {
+    Flaunt.prototype.whenToAnimate = function () {
         if (this.options.onLoad === true) {
-            window.addEventListener("load", () => {
-                this.unveil();
-            });
+            this.onLoad();
         } else {
             this.onScroll();
         }
     }
 
+    Flaunt.prototype.onLoad = function () {
+        window.addEventListener("load", () => {
+            this.animate();
+        });
+    }
+
     Flaunt.prototype.onScroll = function () {
         const el = this.element;
+        const _ = this;
         if (typeof (el) != 'undefined' && el != null) {
             const rect = el.getBoundingClientRect();
 
@@ -79,7 +85,7 @@ var qs = function (s) {
 
                 //... calculations
                 if (((window.pageYOffset || document.documentElement.scrollTop) - (document.documentElement.clientTop || 0)) + (window.innerHeight / 1.6) > Math.round(rect.top)) {
-                    return _.unveil();
+                    return _.animate();
                 }
                 scroll(loop);
             }
@@ -90,85 +96,143 @@ var qs = function (s) {
         }
     };
 
-    Flaunt.prototype.unveil = function () {
-        if (this.options.effect === 'mask') {
-            this.unMask();
-        } else if (this.options.effect === 'slide') {
-            this.unHide();
+    Flaunt.prototype.animate = function () {
+        const el = this.element;
+        if (typeof (el) != 'undefined' && el != null) {
+            TweenLite.to(el, this.options.duration, this.getEndEntries());
         }
     }
 
-    Flaunt.prototype.mask = function () {
-        const el = this.element;
-
-        if (typeof (el) != 'undefined' && el != null) {
-
-            if (!this.isClipPathSupported) {
-                const self = this;
-                TweenLite.to(el, 0, {
-                    delay: self.options.delay,
-                    ease: self.options.easing,
-                    x: self.options.slide.xDistance,
-                    autoAlpha: 0,
-                });
-            } else {
-                // CSS clip-path mask
-                el.style.clipPath = `polygon(0% ${this.options.mask.yFactor}%, 0% ${this.options.mask.yFactor}%, 0% 100%, 0% 100%)`
-            }
-        }
-    };
-
-
-    Flaunt.prototype.unMask = function () {
-        const el = this.element;
-
-        if (typeof (el) != 'undefined' && el != null) {
-            const self = this;
-            if (!this.isClipPathSupported) {
-                TweenLite.to(el, this.options.duration, {
-                    delay: self.options.delay,
-                    ease: self.options.easing,
-                    x: 0,
-                    autoAlpha: 1,
-                });
-            } else {
-                TweenLite.to(el, this.options.duration, {
-                    delay: self.options.delay,
-                    ease: self.options.easing,
-                    clipPath: `polygon(0% ${this.options.mask.yFactor}%, 100% ${this.options.mask.yFactor}%, 100% 100%, 0% 100%)`,
-                });
-            }
-        }
-    };
-
-    Flaunt.prototype.hide = function () {
+    Flaunt.prototype.startState = function () {
         const el = this.element;
         if (typeof (el) != 'undefined' && el != null) {
-            const xDistance = this.options.slide.xDistance;
-            const yDistance = this.options.slide.yDistance;
-            let opacityOptions = this.options.slide.opacity == true ? 0 : 1;
-
-            TweenLite.to(el, 0, {
-                autoAlpha: opacityOptions,
-                x: xDistance,
-                y: yDistance
-            });
+            TweenLite.to(el, 0, this.getStartEntries());
         }
     }
 
-    Flaunt.prototype.unHide = function () {
-        const el = this.element;
-        if (typeof (el) != 'undefined' && el != null) {
-            const self = this;
+    Flaunt.prototype.getStartEntries = function () {
+        const _ = this;
+        const entries = Object.entries(_.options.animation);
+        let animationArray = [];
 
-            TweenLite.to(el, self.options.duration, {
-                delay: self.options.delay,
-                ease: self.options.easing,
-                autoAlpha: 1,
-                x: 0,
-                y: 0
-            });
-        }
+        entries.forEach((item) => {
+            if (item[0] === 'translate') {
+
+                Object.entries(item[1]).forEach((i) => {
+                    let translate = {};
+                    if (i[1] !== 0) {
+                        // {key: '', value: ''}
+                        translate.key = i[0];
+                        translate.value = i[1];
+
+                        // {key: value}
+                        //translate[i[0]] = i[1];
+                        animationArray.push(translate);
+                    }
+                })
+            } else if (item[0] === 'scale') {
+                Object.entries(item[1]).forEach((i, index) => {
+                    var scale = {};
+                    if (i[1] !== 0) {
+                        // {key: '', value: ''}
+                        scale.key = `scale${i[0].toUpperCase()}`;
+                        scale.value = i[1];
+
+                        // {key: value}
+                        // scale[`scale${i[0].toUpperCase()}`] = i[1];
+                        animationArray.push(scale);
+                    }
+                })
+            } else if (item[0] === 'opacity') {
+                var opacity = {};
+                opacity.key = `autoAlpha`;
+                opacity.value = item[1];
+                //opacity['autoAlpha'] = item[1];
+                animationArray.push(opacity);
+            }
+            else if (item[0] === 'mask') {
+                var mask = {};
+                mask.key = 'clipPath';
+                mask.value = `polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)`
+                //mask['clipPath'] = `polygon(0 % ${this.options.animation.mask.yOffset} %, 0 % ${this.options.animation.mask.yOffset} %, 0 % 100 %, 0 % 100 %)`;
+                animationArray.push(mask);
+            }
+        });
+        const animationObject = arrayToObject(animationArray);
+        console.log(animationObject);
+        return animationObject;
+    }
+
+    Flaunt.prototype.getEndEntries = function () {
+        const _ = this;
+
+        // Animation
+        const entries = Object.entries(_.options.animation);
+        let animationArray = [];
+
+
+        entries.forEach((item) => {
+            if (item[0] === 'translate') {
+
+                Object.entries(item[1]).forEach((i) => {
+                    let translate = {};
+                    if (i[1] !== 0) {
+                        // {key: '', value: ''}
+                        translate.key = i[0];
+                        translate.value = 0;
+
+                        // {key: value}
+                        //translate[i[0]] = i[1];
+                        animationArray.push(translate);
+                    }
+                })
+            } else if (item[0] === 'scale') {
+                Object.entries(item[1]).forEach((i, index) => {
+                    var scale = {};
+                    if (i[1] !== 0) {
+                        // {key: '', value: ''}
+                        scale.key = `scale${i[0].toUpperCase()}`;
+                        scale.value = 1;
+
+                        // {key: value}
+                        // scale[`scale${i[0].toUpperCase()}`] = i[1];
+                        animationArray.push(scale);
+                    }
+                })
+            } else if (item[0] === 'opacity') {
+                var opacity = {};
+                opacity.key = `autoAlpha`;
+                opacity.value = 1;
+                //opacity['autoAlpha'] = item[1];
+                animationArray.push(opacity);
+            }
+            else if (item[0] === 'mask') {
+                var mask = {};
+                mask.key = 'clipPath';
+                mask.value = `polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)`
+                animationArray.push(mask);
+            }
+
+            // Delay
+            if (_.options.delay > 0) {
+                let delay = {};
+                delay.key = `delay`;
+                delay.value = _.options.delay;
+                animationArray.push(delay);
+            }
+
+            // Easing
+            let ease = {};
+            ease.key = `ease`;
+            ease.value = _.options.easing;
+            animationArray.push(ease);
+
+        });
+
+
+        const animationObject = arrayToObject(animationArray);
+        console.log(animationObject);
+        return animationObject;
     }
 
     var extend = function (defaults, options) {
@@ -186,6 +250,12 @@ var qs = function (s) {
         }
         return extended;
     };
+
+    const arrayToObject = (array) =>
+        array.reduce((obj, item) => {
+            obj[item.key] = item.value
+            return obj
+        }, {});
 
 
 }(qs, window));

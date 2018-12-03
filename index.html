@@ -69,18 +69,34 @@
         new Flaunt({
             el: '#title-1',
             onLoad: true,
-            effect: 'mask',
+            animation: {
+                mask: {},
+                translate: {
+                    x: 32,
+                }
+            }
         });
         new Flaunt({
             el: '#box-1',
             onLoad: true,
-            effect: 'mask',
-            delay: 1
+            duration: 5,
+            delay: 1,
+            animation: {
+                mask: {},
+                translate: {
+                    x: -32,
+                }
+            }
         });
 
         new Flaunt({
             el: '#box-2',
-            effect: 'mask',
+            animation: {
+                mask: {},
+                translate: {
+                    x: -32,
+                }
+            }
         });
     </script>
 </body>
