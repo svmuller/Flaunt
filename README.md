@@ -4,7 +4,7 @@ Reveals elements on load/scroll
 
 [Example available here](https://svmuller.github.io/Flaunt/)
 
-### Basic usage
+## Basic usage
 
 ```javascript
 new Flaunt({
@@ -24,8 +24,17 @@ new Flaunt({
 
 ### Dependency
 
-The animations are powered by GSAP's Tweenlite
+[GSAP](https://greensock.com/gsap)
 
 ### Compatibility
 
-WIP
+Given ```clip-path``` support, stick to ```overflow: hidden```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+### TODO
+
+Swap offsets to IntersectionObserver for firing events
+
