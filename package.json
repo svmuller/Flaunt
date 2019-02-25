@@ -1,7 +1,7 @@
 {
-    "name": "getting_started_with_webpack_and_es6_modules",
+    "name": "flaunt",
     "version": "0.1.0",
-    "description": "Getting started with webpack and ES6 modules",
+    "description": "Reveal on load/scroll",
     "scripts": {
         "start": "npm run webpack",
         "webpack": "webpack -d --watch"
