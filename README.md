@@ -28,7 +28,7 @@ new Flaunt({
 
 ### Compatibility
 
-Given ```clip-path``` support, stick to ```overflow: hidden```
+```clip-path``` is not supported on IE/Edge and Safari - [Can I Use clip-path](https://caniuse.com/#search=clip-path)
 
 ## License
 
@@ -37,4 +37,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ### TODO
 
 Swap offsets to IntersectionObserver for firing events
+Remove ```clip-path``` and switch to ```overflow: hidden``` for IE/Edge and Safari support
 
